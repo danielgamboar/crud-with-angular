@@ -20,11 +20,14 @@ export class HomeComponent {
   vacations: IVacation[] = []
   newVacationForm!: FormGroup;
 
-  constructor(private router: Router, private vacationService: VacationsService) {}
+  constructor(
+    private router: Router,
+    private vacationService: VacationsService
+  ) {}
 
   ngOnInit(){
     this.createForm();
-    this.vacations = this.vacationService.getVacations()
+    this.loadVacations();
   }
 
   createForm() {
@@ -41,11 +44,16 @@ export class HomeComponent {
     this.router.navigate(['about-us']);
   }
 
+  loadVacations(){
+    this.vacationService.getVacations().subscribe((vacations: IVacation[])=> {
+      this.vacations = vacations
+    })
+  }
+
   addNewVacation() {
     if (!this.newVacationForm.valid) return alert("Invalid form!")
 
     const newVacation: IVacation = {
-      id: this.vacations.length + 1,
       name: this.newVacationForm.get('name')?.value,
       price: Number(this.newVacationForm.get('price')?.value),
       description: this.newVacationForm.get('description')?.value,
@@ -54,15 +62,16 @@ export class HomeComponent {
     }
 
     this.vacationService.addVacation(newVacation);
-    this.vacations = this.vacationService.getVacations();
+   this.loadVacations();
   }
 
-  deleteVacation(index: number) {
-    this.vacations = this.vacationService.deleteVacation(index);
+  deleteVacation(id: string) {
   }
 
-  editVacation(index: number) {
-    const vacation = this.vacationService.getVacationById(index);
+  editVacation(id: string) {
+    const vacation = this.vacationService.getVacationById(id).subscribe((vacation: IVacation)=>{
+
+    });
     console.log(vacation)
   }
 }

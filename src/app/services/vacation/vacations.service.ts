@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IVacation } from '../../model/types';
+import { addDoc, collection, collectionData, deleteDoc, doc, docData, Firestore, updateDoc } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,46 +11,37 @@ import { IVacation } from '../../model/types';
 
 export class VacationsService {
 
-  constructor() { }
+  constructor(private firestore: Firestore) { }
 
   private saveVacations(vacations: IVacation[]) {
     localStorage.setItem('vacations', JSON.stringify(vacations))
   }
 
-  getVacations(): IVacation[] {
-    const vacations = localStorage.getItem('vacations');
-    return vacations ?  JSON.parse(vacations) as IVacation[] : [];
+  addVacation(newVacation: IVacation) {
+    const vacationRef = collection(this.firestore, 'vacations');
+
+    return addDoc(vacationRef, newVacation);
   }
 
-  addVacation(newVacation: IVacation): boolean {
-    const vacations = this.getVacations(); // []
-
-    vacations.push(newVacation);
-
-    this.saveVacations(vacations);
-
-    return true
+  getVacationById (id: string): Observable<IVacation> {
+   const vacationRef = doc(this.firestore, `vacations/${id}`);
+   return docData(vacationRef, {idField: 'id'}) as Observable<IVacation>
   }
 
-  deleteVacation(index: number): IVacation[] {
-    let auxVacations = this.getVacations();
-    auxVacations.splice(index, 1);
-    this.saveVacations(auxVacations);
-    return this.getVacations();
+  getVacations(): Observable<IVacation[]> {
+    const vacationRef = collection(this.firestore, 'vacations');
+
+    return collectionData(vacationRef, {idField: 'id'}) as Observable<IVacation[]>
   }
 
-  getVacationByIndex(index: number): IVacation {
-    const vacationsList = this.getVacations();
 
-    return vacationsList[index];
+  deleteVacation(vacation: IVacation){
+    const vacationRef = doc(this.firestore, `vacances/${vacation.id}`);
+    return deleteDoc(vacationRef);
   }
 
-  getVacationById (id: number): IVacation | undefined {
-    const vacations = this.getVacations()
-
-    const vacation = vacations.find(vacation => vacation.id === id)
-
-    return vacation
-
+  updateVacanca(vacation: IVacation) {
+    const vacationRef = doc(this.firestore, `vacances/${vacation.id}`);
+    return updateDoc(vacationRef, { ...vacation });
   }
 }

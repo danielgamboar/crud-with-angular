@@ -26,8 +26,8 @@
     <div *ngFor="let vacation of vacations; index as $i">
         <h2>{{vacation.name}}</h2>
         <div>
-          <button (click)="editVacation(vacation.id)">Edit</button>
-          <button (click)="deleteVacation($i)">Delete</button>
+          <button (click)="editVacation(vacation.id!)">Edit</button>
+          <button (click)="deleteVacation(vacation.id!)">Delete</button>
         </div>
     </div>
 </section>
